@@ -117,49 +117,100 @@ bool comessToX(Player *player,Piece* piece,Cell *startingCell){
     }
 }
 
-//currunt player index, playiny cellrttree 
-/*
-void capture(unsigned short int playerIndex ,unsigned short int cellId,unsigned short int steps,short int wice){
-    unsigned short  int captureCount=0;
-    unsigned short int pieceColsetToHomeIndex;
-    Player *currentPlayer = &players[playerIndex];
-    Player *tempPlayer;
-    Cell *currentPiece = &cells[cellId];
-    Piece pieceColsetToHome = NULL;
-= ;//gonning to capture if can
-
-    //in fifth round capture the piece first 4th rounds it check whats closet to home
-    for(unsigned short int = 0;i<4; i++){
-        tempPlayer=players[i];
-        if(tempPlayer==curr)
-    }
-
-    for(unsigned short int i=0; i<5;i++){
-        tempPlayer[playerIndex];
-        if(tempPlayer==currentPlayer) continue;
-        short int pieceIndex=0;
-        for(unsigned short int j=0;j<4; j++){
-            Piece *tempPiece= &tempPlayer->pieces[pieceIndex];
-            Cell *nextCell=&cells[tempPiece->position];
-            if(captureCount!=4 cell->id+(wice*steps)==tempPiece->position && currentPiece->blockCount>=nextCell->blockCount){
-                captureCount++;
-                printf("CanCapture");
-                if(pieceColsetToHome->id > )
-
-            }
-
-            pieceIndex = (pieceIndex+1)%4;
-        }
-        playerIndex=(playerIndex+1)%4;
-        if(captureCount > 0){
-
-        }
-    }*/
+//reset piece value as defaults
+void resetPiece(Piece *piece){
+    piece->position =0;
+    piece->wice =1;
+    piece->blockId=0;
+    piece->isPlaying=0;
+    piece->isCapture =0;
 }
+//currunt player index, playiny cellrttree need to iterate piece
+
+
+// void capture(unsigned short int playerIndex ,unsigned short int pieceIndex,unsigned short int steps,short int wice){
+//     unsigned short  int captureCount=0;
+//     unsigned short int pieceColsetToHomeIndex;
+//     Player *currentPlayer = &players[playerIndex];
+//     Player *tempPlayer;
+//     Piece *currentPiece = &currentPlayer->pieces[pieceIndex];
+//     Cell *currentCell = &cells[currentPiece->position];
+//     Piece *pieceColsetToHome = NULL; //gonning to capture if can
+
+//     //in fifth round capture the piece first 4th rounds it check whats closet to home
+//     for(unsigned short int i = 0;i<4; i++){
+//         tempPlayer=&players[i];
+//         if(tempPlayer==currentPlayer) continue;
+
+//         unsigned short int pieceIndex= 0;
+//         for(unsigned short int j=0;j<currentPlayer->onplaying;j++){
+//             Piece *tempPiece = &tempPlayer->pieces[j];
+//             Cell *tempCell = &cells[tempPiece->position];
+//           //  Cell *capCell = &cells[tempPiece->posiiton];
+//             if(currentPiece->position + wice*steps && currentCell->blockCount >= tempCell->blockCount){
+//                 captureCount++;
+
+//             }
+//         }
+//         if(captureCount>0){
+//             resetPiece(tempPiece);
+//         }
+//     }
+
+
+
+
+//     for(unsigned short int i=0; i<5;i++){
+
+//         tempPlayer[playerIndex];
+//         if(tempPlayer==currentPlayer) continue;
+//         short int pieceIndex=0;
+//         for(unsigned short int j=0;j<4; j++){
+//             Piece *tempPiece= &tempPlayer->pieces[pieceIndex];
+//             Cell *nextCell=&cells[tempPiece->position];
+//             if(captureCount!=4 cell->id+(wice*steps)==tempPiece->position && currentPiece->blockCount>=nextCell->blockCount){
+//                 captureCount++;
+//                 printf("CanCapture");
+//                 if(pieceColsetToHome->id > )
+
+//             }
+
+//             pieceIndex = (pieceIndex+1)%4;
+//         }
+//         playerIndex=(playerIndex+1)%4;
+//         if(captureCount > 0){
+
+//         }
+//     }
+// }
 
 //yellow player behevious
 void YellowPlayer(unsigned short int diceValue){
     
+}
+
+void redCapture(/*Player *players[],*/Player *currentPlayer, unsigned short int steps){
+    Piece *pieceCloseToHome=NULL;
+    unsigned short int captureCount=0;
+    //iterate player
+    for(int i=0; i<4;i++){
+        Piece *currentPiece = &currentPlayer->pieces[i];
+        if(currentPiece->isPlaying){
+            for(int j=0; j< 4 ;j++){
+                Player *player = &players[i];
+                if (player==currentPlayer) continue; //skip same player
+                for(int k=0;k<4;k++){
+                    Piece *tempPiece = &player->pieces[k];
+                    unsigned short int nextCell = (currentPiece->position + currentPiece->wice*steps)%52; 
+                    if(!tempPiece->isPlaying || tempPiece->isHome) continue; //skip piece that went to home and notPlaying
+                    if(nextCell == tempPiece->position){
+                        captureCount++;
+                        printf("Capture times - %d",captureCount);
+                    }
+                }
+            }
+        }
+    }
 }
 
 //red palyer behevious
@@ -171,22 +222,25 @@ void redPlayer(unsigned short int diceVal){
    //check player's piece in the board if not get piece into board
    if(player->onplaying == 0 && diceVal== 6 ){
         Cell *startingCell = &cells[player->startingPoint];
-        for(unsigned short int i =1; i<4; i++){
+        for(unsigned short int i =0; i<4; i++){
             Piece *piece = &player->pieces[i];
             if (comessToX(player,  piece, startingCell)) return;
         }
-        player->onplaying=true;
         return;
     }
 
+    //redplayer's capture function
+    redCapture(&players[2],4);//not done yet
 
-    else if(player->onplaying > 0 && diceVal== 6 ){
+    /*else*/ 
+    if(player->onplaying > 0 && diceVal== 6 ){
         Cell *startingCell = &cells[player->startingPoint];
-        for(unsigned short int i =1; i<4; i++){
+        for(unsigned short int i =0; i<4; i++){
             Piece *piece = &player->pieces[i];
             if (comessToX(player,  piece, startingCell)) return;
         }
     }
+    //move function
 }
 void movePices(Player player){
 
@@ -203,7 +257,12 @@ void logic(){
 
     redPlayer(6);
     printf("Hello\n");
-
+    redPlayer(6);
+    printf("Hello\n");
+    redPlayer(6);
+    printf("Hello\n");
+    redPlayer(6);
+    printf("Hello\n");
     //Player *player = &players[2];
     
 }
